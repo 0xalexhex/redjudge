@@ -1,0 +1,18 @@
+# Secrets - never commit
+.env
+*.key
+*_api_key*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+
+# Benchmark datasets are fetched on demand (scripts/get_datasets.py), never committed.
+data/
+
+# Runtime outputs are regenerated and can contain transcripts; don't ship them.
+results/*
+!results/.gitkeep
