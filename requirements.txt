@@ -1,0 +1,4 @@
+# The core harness runs on the Python 3.10+ standard library alone - no install needed.
+# Optional, per feature:
+Pillow>=10.0        # only for the multimodal / visual-injection suite (renders text into images)
+# White-box GCG (roadmap, not yet implemented) would also need: torch, transformers, nanogcg
