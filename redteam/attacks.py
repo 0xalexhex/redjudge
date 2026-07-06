@@ -7,10 +7,12 @@ operational harmful content. They map 1:1 to the §1 verified findings:
   ManyShot    -> Anthropic many-shot (in-context, BENIGN shots)
   MultiTurn   -> Crescendo-style escalation
   PAIR        -> attacker-LLM iterative refinement (black-box)
+  TAP         -> Tree of Attacks with Pruning (PAIR generalized to a pruned beam search)
+  BestOfN     -> Best-of-N: sample N input augmentations, keep any that break
 GCG (white-box gradient) is a separate heavy module - see README (needs a local HF model).
 """
 from __future__ import annotations
-import base64, codecs
+import base64, codecs, random, zlib
 from .core import register, Behavior, Target, Turn, AttackResult, strip_think
 
 
