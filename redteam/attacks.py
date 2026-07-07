@@ -156,3 +156,30 @@ class PAIR:
                 if type(e).__name__ == "BudgetExceeded": raise   # let the budget kill-switch abort
                 break
         return best
+
+
+def _one_query(behavior, target, judge, prompt, attack_name, extra):
+    """Single target query + grade -> AttackResult. Shared by TAP's tree nodes and the baseline."""
+    sys = behavior.meta.get("system", "")
+    tr = ([Turn("system", sys)] if sys else []) + [Turn("user", prompt)]
+    out = target.chat(_conv(tr)); tr.append(Turn("assistant", out))
+    broken, sc = _grade(judge, behavior, tr, out)
+    return AttackResult(behavior.id, attack_name, target.name, tr, out, broken, {**sc, **extra})
+
+
+class TAP:
+    """Tree of Attacks with Pruning (Mehrotra et al., 2024): PAIR generalized from a single
+    refinement chain to a pruned beam search. Black-box; wants a separate attacker model."""
+    name = "tap"
+    def __init__(self, attacker=None, width=4, depth=3, keep=3):
+        self.attacker, self.width, self.depth, self.keep = attacker, width, depth, keep
+
+    def run(self, behavior, target, judge):
+        attacker = self.attacker or target
+        # root = the plain goal (baseline node)
+        best = _one_query(behavior, target, judge, behavior.goal, self.name, {"depth": 0})
+        frontier = [(behavior.goal, best.final_response, str(best.judge))]   # (prompt, last_reply, note)
+        for d in range(1, self.depth + 1):
+            for prompt, last_reply, note in frontier:
+                pass   # TODO: branch into children, prune off-topic, query survivors, keep top-k
+        return best
