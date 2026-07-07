@@ -209,11 +209,19 @@ class TAP:
         attacker = self.attacker or target
         # root = the plain goal (baseline node)
         best = _one_query(behavior, target, judge, behavior.goal, self.name, {"depth": 0})
+        best_score = _fulfillment(best.judge)
         frontier = [(behavior.goal, best.final_response, str(best.judge))]   # (prompt, last_reply, note)
         for d in range(1, self.depth + 1):
+            scored = []
             for prompt, last_reply, note in frontier:
                 kids = self._branch(attacker, behavior.goal, prompt, last_reply, note, self.width)
                 kids = [k for k in kids if self._on_topic(attacker, behavior.goal, k)] or kids
                 for k in kids:
                     res = _one_query(behavior, target, judge, k, self.name, {"depth": d})
+                    score = _fulfillment(res.judge)
+                    if score > best_score:
+                        best, best_score = res, score
+                    scored.append((score, k, res.final_response, str(res.judge)))
+            scored.sort(key=lambda x: -x[0])
+            frontier = [(k, lr, nt) for _, k, lr, nt in scored[:self.keep]] or frontier
         return best
