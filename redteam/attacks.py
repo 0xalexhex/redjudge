@@ -207,8 +207,10 @@ class TAP:
 
     def run(self, behavior, target, judge):
         attacker = self.attacker or target
-        # root = the plain goal (baseline node)
+        # root = the plain goal (baseline node); early-exit if the target breaks on it outright.
         best = _one_query(behavior, target, judge, behavior.goal, self.name, {"depth": 0})
+        if best.broken:
+            return best
         best_score = _fulfillment(best.judge)
         frontier = [(behavior.goal, best.final_response, str(best.judge))]   # (prompt, last_reply, note)
         for d in range(1, self.depth + 1):
@@ -218,6 +220,8 @@ class TAP:
                 kids = [k for k in kids if self._on_topic(attacker, behavior.goal, k)] or kids
                 for k in kids:
                     res = _one_query(behavior, target, judge, k, self.name, {"depth": d})
+                    if res.broken:
+                        return res                                  # first real break wins
                     score = _fulfillment(res.judge)
                     if score > best_score:
                         best, best_score = res, score
