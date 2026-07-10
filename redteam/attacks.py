@@ -167,6 +167,7 @@ def _one_query(behavior, target, judge, prompt, attack_name, extra):
     return AttackResult(behavior.id, attack_name, target.name, tr, out, broken, {**sc, **extra})
 
 
+@register("attacks")
 class TAP:
     """Tree of Attacks with Pruning (Mehrotra et al., 2024): PAIR generalized from a single
     refinement chain to a pruned beam search. Black-box; wants a separate attacker model."""
