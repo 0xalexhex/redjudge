@@ -239,3 +239,25 @@ class TAP:
             scored.sort(key=lambda x: -x[0])
             frontier = [(k, lr, nt) for _, k, lr, nt in scored[:self.keep]] or frontier
         return best
+
+
+@register("attacks")
+class BestOfN:
+    """Best-of-N jailbreaking (Hughes et al., Anthropic 2024). Sample N augmented variants of the
+    prompt and keep any that break - a gradient-free black-box attack. Query-heavy, opt-in via
+    `--attacks bon`."""
+    name = "bon"
+    def __init__(self, n=12, seed=0, sigma=0.4):
+        self.n, self.seed, self.sigma = n, seed, sigma
+
+    def run(self, behavior, target, judge):
+        rng = random.Random(self.seed)
+        best, best_score = None, -1.0
+        for i in range(self.n):
+            res = _one_query(behavior, target, judge, behavior.goal, self.name, {"sample": i + 1})
+            if res.broken:
+                return res
+            score = _fulfillment(res.judge)
+            if score > best_score:
+                best, best_score = res, score
+        return best
