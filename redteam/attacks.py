@@ -169,10 +169,17 @@ def _one_query(behavior, target, judge, prompt, attack_name, extra):
 
 @register("attacks")
 class TAP:
-    """Tree of Attacks with Pruning (Mehrotra et al., 2024): PAIR generalized from a single
-    refinement chain to a pruned beam search. Black-box; wants a separate attacker model."""
+    """Tree of Attacks with Pruning (Mehrotra et al., NeurIPS 2024). Generalizes PAIR from a single
+    refinement chain to a pruned beam search: each round the attacker LLM branches every surviving
+    prompt into `width` refined children, an on-topic PRUNE drops children that drifted off the goal
+    (TAP's key addition over naive tree search - it saves target queries on dead branches), the
+    target is queried with each survivor, and only the top-`keep` by fulfillment score advance to
+    the next depth. Early-exits on the first genuine break; otherwise returns the best-scoring
+    attempt (like PAIR keeps its best, finding #8). Black-box; needs a separate attacker model to be
+    meaningful (falls back to self-attack). Roughly width*keep*depth target queries - query-heavy, so
+    opt-in via `--attacks tap`."""
     name = "tap"
-    def __init__(self, attacker=None, width=4, depth=3, keep=3):
+    def __init__(self, attacker: Target | None = None, width=3, depth=3, keep=2):
         self.attacker, self.width, self.depth, self.keep = attacker, width, depth, keep
 
     def _branch(self, attacker, goal, prompt, last_reply, note, n):
