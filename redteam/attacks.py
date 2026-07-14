@@ -241,6 +241,14 @@ class TAP:
         return best
 
 
+def _scramble_word(rng, w):
+    """Shuffle the interior letters of a word, keeping the first and last char (BoN word-scramble)."""
+    if len(w) <= 3:
+        return w
+    mid = list(w[1:-1]); rng.shuffle(mid)
+    return w[0] + "".join(mid) + w[-1]
+
+
 @register("attacks")
 class BestOfN:
     """Best-of-N jailbreaking (Hughes et al., Anthropic 2024). Sample N augmented variants of the
@@ -250,13 +258,35 @@ class BestOfN:
     def __init__(self, n=12, seed=0, sigma=0.4):
         self.n, self.seed, self.sigma = n, seed, sigma
 
+    def _augment(self, rng, text):
+        words = [_scramble_word(rng, w) if rng.random() < self.sigma else w for w in text.split(" ")]
+        s = " ".join(words)
+        s = "".join(
+            (c.upper() if c.islower() else c.lower()) if (c.isalpha() and rng.random() < self.sigma) else c
+            for c in s)
+        out = []                                                    # light ASCII noise (duplicate/drop)
+        for c in s:
+            r = rng.random()
+            if c.isalpha() and r < self.sigma * 0.10:
+                out.append(c * 2)
+            elif c == " " and r < self.sigma * 0.15:
+                continue
+            else:
+                out.append(c)
+        return "".join(out)
+
     def run(self, behavior, target, judge):
         rng = random.Random(self.seed)
         best, best_score = None, -1.0
         for i in range(self.n):
-            res = _one_query(behavior, target, judge, behavior.goal, self.name, {"sample": i + 1})
+            prompt = self._augment(rng, behavior.goal)
+            try:
+                res = _one_query(behavior, target, judge, prompt, self.name, {"sample": i + 1})
+            except Exception as e:
+                if type(e).__name__ == "BudgetExceeded": raise
+                continue
             if res.broken:
-                return res
+                return res                                          # first successful augmentation wins
             score = _fulfillment(res.judge)
             if score > best_score:
                 best, best_score = res, score
