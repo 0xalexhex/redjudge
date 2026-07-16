@@ -276,7 +276,7 @@ class BestOfN:
         return "".join(out)
 
     def run(self, behavior, target, judge):
-        rng = random.Random(self.seed)
+        rng = random.Random((self.seed * 1000003) ^ zlib.crc32(behavior.id.encode()))
         best, best_score = None, -1.0
         for i in range(self.n):
             prompt = self._augment(rng, behavior.goal)
