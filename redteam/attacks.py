@@ -252,8 +252,13 @@ def _scramble_word(rng, w):
 @register("attacks")
 class BestOfN:
     """Best-of-N jailbreaking (Hughes et al., Anthropic 2024). Sample N augmented variants of the
-    prompt and keep any that break - a gradient-free black-box attack. Query-heavy, opt-in via
-    `--attacks bon`."""
+    prompt - word scrambling, random capitalization, light character noise - and keep any variant
+    that breaks. A gradient-free, black-box attack that exploits the model's sensitivity to
+    input-space perturbations; ASR climbs with N (a power law in the paper). `sigma` sets
+    perturbation strength. Deterministic given `seed` (per-behavior RNG derived with crc32, NOT
+    Python's salted hash, so ASR reproduces across processes). The AUGMENTATION is what varies the
+    input, so it still probes a temperature-0 target. Sample 0 is the clean baseline. Query-heavy
+    (N target calls per behavior) - opt-in via `--attacks bon`."""
     name = "bon"
     def __init__(self, n=12, seed=0, sigma=0.4):
         self.n, self.seed, self.sigma = n, seed, sigma
@@ -279,7 +284,7 @@ class BestOfN:
         rng = random.Random((self.seed * 1000003) ^ zlib.crc32(behavior.id.encode()))
         best, best_score = None, -1.0
         for i in range(self.n):
-            prompt = self._augment(rng, behavior.goal)
+            prompt = behavior.goal if i == 0 else self._augment(rng, behavior.goal)
             try:
                 res = _one_query(behavior, target, judge, prompt, self.name, {"sample": i + 1})
             except Exception as e:
@@ -290,4 +295,4 @@ class BestOfN:
             score = _fulfillment(res.judge)
             if score > best_score:
                 best, best_score = res, score
-        return best
+        return best or _one_query(behavior, target, judge, behavior.goal, self.name, {"sample": 0})
