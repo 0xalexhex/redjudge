@@ -35,7 +35,10 @@ from redteam.injection import build_injection_suite, injection_attacks, Injectio
 from redteam.agentic import build_agentic_suite, AgenticAttack, AgenticJudge
 from redteam.multimodal import build_multimodal_suite, multimodal_attacks
 
+# Default single-turn/refinement attacks. TAP and BoN are QUERY-HEAVY (tree search / N-sampling),
+# so they stay opt-in via `--attacks tap`/`--attacks bon` and are not run by default.
 ATTACK_NAMES = ["direct", "encoding", "manyshot", "multiturn", "pair"]
+HEAVY_ATTACKS = ["tap", "bon"]
 # built-in scenario suites -> default attack names
 SUITE_ATTACKS = {"injection": [a.name for a in injection_attacks()], "agentic": ["agentic"],
                  "multimodal": [a.name for a in multimodal_attacks()]}
