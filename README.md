@@ -1,6 +1,6 @@
 # RedJudge - an automated LLM red-team / robustness harness
 
-**v0.1.0** · [QUICKSTART.md](QUICKSTART.md) · [WRITEUP.md](WRITEUP.md) (finding) · [CHANGELOG.md](CHANGELOG.md) · [FINDINGS.md](FINDINGS.md)
+**v0.2.0** · [QUICKSTART.md](QUICKSTART.md) · [WRITEUP.md](WRITEUP.md) (finding) · [CHANGELOG.md](CHANGELOG.md) · [FINDINGS.md](FINDINGS.md)
 
 A CI-style robustness-evaluation harness for LLMs.
 Pluggable **Behaviors × Attacks × Targets × Judge -> Scorecard**, modeled on HarmBench's
@@ -32,6 +32,11 @@ python3 run.py --benchmark strongreject_small --limit 15 --budget 2.0 \
 
 # bring your own set (auto-detects goal/behavior/Goal/forbidden_prompt columns):
 python3 run.py --benchmark path/to/your.csv --target ollama:llama3.1:8b --guard ollama:llama-guard3:8b
+
+# heavier automated jailbreaks (opt-in - query-heavy). TAP wants a separate attacker model:
+python3 run.py --benchmark strongreject_small --limit 15 --attacks tap bon \
+  --target ollama:llama3.1:8b --attacker ollama:llama3.1:8b \
+  --guard ollama:llama-guard3:8b --judge ollama:llama3.1:8b
 ```
 Outputs: `results/<out>/scorecard.md` (harmful ASR + mean StrongREJECT + Llama Guard hazard categories
 + over-refusal control) and `results.jsonl` (full transcripts). Without `--guard` the scorecard is
@@ -63,7 +68,11 @@ python3 run.py --suite multimodal --target vision:llama3.2-vision:11b
 ## What's implemented
 - **Attacks** (`redteam/attacks.py`): `direct` (control), `encoding` (base64/rot13/leet obfuscation),
   `manyshot` (Anthropic many-shot, benign exemplars), `multiturn` (Crescendo-style escalation),
-  `pair` (attacker-LLM iterative refinement). All are *mechanisms* operating on the supplied behavior.
+  `pair` (attacker-LLM iterative refinement), `tap` (Tree of Attacks with Pruning - PAIR generalized
+  to a pruned beam search, Mehrotra et al. 2024), `bon` (Best-of-N - sample N input augmentations and
+  keep any that break, Hughes et al. 2024). All are *mechanisms* operating on the supplied behavior.
+  `tap`/`bon` are query-heavy (tree search / N-sampling), so they are opt-in via `--attacks tap`/
+  `--attacks bon` rather than in the default set.
 - **Targets** (`redteam/targets.py`): `dryrun` mock · `openai_compat` (Ollama/vLLM/LM Studio/OpenAI/Together/Groq/OpenRouter) · `anthropic` · `webui` (gated).
 - **Judge** (`redteam/judge.py`): **validated ensemble** - `llama-guard` (Meta Llama Guard 3
   classifier, *authoritative* harmful-content ASR) + `strongreject` (faithful StrongREJECT autograder,
@@ -83,8 +92,8 @@ python3 run.py --suite multimodal --target vision:llama3.2-vision:11b
 - **GCG / AutoDAN (white-box):** need a local HF/transformers model with gradient access - add a
   `targets` adapter exposing logits and a `gcg` attack (use `nanogcg`). White-box only -> then
   **transfer** the suffixes to the black-box adapters. (The local RTX 3090 makes this feasible.)
-- **Real many-shot / TAP / AutoDAN-Turbo:** deepen the jailbreak attacks (N=128+ harmful exemplars;
-  tree-of-attacks; self-improving strategy library).
+- **Real many-shot / AutoDAN-Turbo:** deepen the jailbreak attacks further (N=128+ harmful exemplars;
+  self-improving strategy library). TAP (tree-of-attacks) is now implemented (`--attacks tap`).
 - **Multimodal audio** + a phishing/content-insertion objective graded by an LLM obedience-judge.
 - **Web-UI driver:** wire Playwright into `WebUITarget.chat` (gated).
 - **Standard agentic benchmarks:** run the real AgentDojo / InjecAgent / AgentHarm sets through the
