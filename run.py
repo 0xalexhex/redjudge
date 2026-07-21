@@ -115,7 +115,9 @@ def main():
     ap.add_argument("--target", action="append", default=[],
                     help="target shortcut, repeatable: ollama:llama3.1 · openrouter:openai/gpt-5.5 · anthropic:claude-sonnet-5 · dryrun")
     ap.add_argument("--target-spec", action="append", default=[], help="full JSON target spec (power users; repeatable)")
-    ap.add_argument("--attacks", nargs="*", default=None, help=f"subset of {ATTACK_NAMES} (or a suite's attacks)")
+    ap.add_argument("--attacks", nargs="*", default=None,
+                    help=f"subset of {ATTACK_NAMES + HEAVY_ATTACKS} (or a suite's attacks). "
+                         f"tap/bon are query-heavy and opt-in (not in the default set)")
     ap.add_argument("--suite", choices=list(SUITE_ATTACKS), help="built-in scenario suite: injection")
     ap.add_argument("--smoke", action="store_true", help="use the bundled BENIGN smoke behaviors")
     ap.add_argument("--owner-pw", action="store_true", help="add the owner-password scenario (guarded secret + rule-override)")
