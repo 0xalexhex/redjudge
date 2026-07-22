@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.2.0
+**Two automated black-box jailbreak searches: TAP and Best-of-N.** Both drop into the existing
+plugin architecture (no runner change) and are opt-in via `--attacks tap`/`--attacks bon` because
+they are query-heavy.
+- **TAP - Tree of Attacks with Pruning** (`attacks.py:TAP`, Mehrotra et al., NeurIPS 2024).
+  Generalizes PAIR from a single refinement chain to a pruned beam search: each round the attacker
+  LLM branches every surviving prompt into `width` children, an **on-topic prune** drops children
+  that drifted off the goal (TAP's key add over naive tree search - it stops wasting target queries
+  on dead branches), the target is queried with each survivor, and only the top-`keep` by
+  fulfillment score advance to the next depth. Early-exits on the first genuine break, else returns
+  the best-scoring attempt (reuses PAIR's keep-the-best logic, finding #8). Roughly `width*keep*depth`
+  target queries; wants a separate `--attacker` model to be meaningful. Moves TAP from the roadmap's
+  "not yet implemented" to implemented.
+- **Best-of-N jailbreaking** (`attacks.py:BestOfN`, Hughes et al., Anthropic 2024). Samples N
+  augmented variants of the prompt (word scrambling, random capitalization, light character noise)
+  and keeps any that break - a gradient-free attack that exploits input-space sensitivity; ASR climbs
+  with N. **Reproducible:** the per-behavior RNG is seeded from `crc32(behavior.id)`, not Python's
+  salted `hash()`, so the ASR is stable across processes. Sample 0 is the clean baseline; the
+  augmentation is what varies the input, so it still probes a temperature-0 target.
+- Both propagate `BudgetExceeded` so the hard `--budget` kill-switch still aborts mid-search, and both
+  render in the existing scorecard (ASR by target × attack) with no reporter change.
+- Docs: README (attack list + a `--attacks tap bon` example), `TEST_CATALOG.md` (mechanisms table +
+  LLM01/ATLAS mapping), attack-module docstring. No fabricated benchmark numbers - real ASR comes from
+  running these against your own targets/benchmarks.
+
 ## v0.1.0
 **Cross-model frontier sweep (OpenRouter) + two judge-integrity fixes.**
 - **OpenRouter support**: `openai_compat` target reads OpenRouter's exact `usage.cost` (via
