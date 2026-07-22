@@ -11,6 +11,8 @@ Everything ships benign (self-planted canary / benchmark-loader BYO) - no operat
 | Many-shot | `attacks.py:ManyShot` | Prepends N in-context exemplars, then the goal | - / AML.T0054 |
 | Multi-turn (Crescendo) | `attacks.py:MultiTurn` | Attacker model escalates over turns, building on each reply | - / AML.T0054 |
 | PAIR | `attacks.py:PAIR` | Attacker LLM iteratively refines one prompt via judge feedback | - / AML.T0054 |
+| TAP | `attacks.py:TAP` | Tree of Attacks with Pruning: attacker branches each prompt, an on-topic prune drops dead branches, top-`keep` by score advance (Mehrotra et al. 2024) | LLM01 / AML.T0054 |
+| Best-of-N | `attacks.py:BestOfN` | Samples N input augmentations (word scramble / random caps / char noise); keeps any that break (Hughes et al. 2024) | LLM01 / AML.T0054 |
 | Persistent-memory chat | `chat.py` | Live multi-turn conversation with full memory; captures the reasoning trace for CoT-leak detection | LLM06 |
 | **Indirect injection** (`--suite injection`) | `injection.py` | Payload planted in untrusted data (email/web/ticket/code/doc/tool-result) × 4 techniques (naive/ignore/authority/encoded) + a **Spotlighting defense** variant | LLM01 / AML.T0051.001 |
 | **Agentic tool-abuse** (`--suite agentic`) | `agentic.py` | ReAct agent over mock sandboxed tools; injection in tool-returned data -> attacker action (exfil / pay / delete) | LLM06 / AML.T0051.001 |
@@ -55,7 +57,7 @@ Local OpenAI-compatible (Ollama / vLLM / LM Studio) · APIs (DeepSeek / OpenAI /
 Layered so a finding maps cleanly onto the frameworks a customer/employer cares about:
 | Vuln class (OWASP LLM Top 10 **2025**) | Attack technique (MITRE ATLAS) | Our coverage |
 |---|---|---|
-| **LLM01** Prompt Injection | AML.T0051 (.000 direct / .001 indirect) | encoding, PAIR, Crescendo + **full indirect-injection suite** (6 carriers × 4 techniques + Spotlighting defense) + **visual/typographic injection** |
+| **LLM01** Prompt Injection | AML.T0051 (.000 direct / .001 indirect) | encoding, PAIR, **TAP**, **Best-of-N**, Crescendo + **full indirect-injection suite** (6 carriers × 4 techniques + Spotlighting defense) + **visual/typographic injection** |
 | **LLM02** Sensitive Information Disclosure | AML.T0057 Data Leakage | canary extraction + injection-driven exfiltration |
 | **LLM06** Excessive Agency | AML.T0051.001 (agentic) | **agentic tool-abuse suite** (ReAct agent, mock tools, exfil/pay/delete via injected tool data) |
 | **LLM07** System Prompt Leakage *(new in 2025)* | AML.T0056 Meta Prompt Extraction | canary extraction + **CoT reasoning-channel leak** (the live finding) |
@@ -69,6 +71,7 @@ tracked as its own metric (the safety-helpfulness tradeoff), matching Gray Swan'
 | Class | Status |
 |---|---|
 | Social-eng / persona / encoding / many-shot / Crescendo / PAIR | implemented (black-box) |
+| Automated jailbreak search - TAP (tree-of-attacks) / Best-of-N augmentation sampling | implemented (`--attacks tap`/`bon`, black-box) |
 | Secret extraction + CoT-leak detection | implemented (strongest area; the live finding) |
 | Calibrated / validated ensemble judging (Llama Guard 3 + StrongREJECT) | implemented |
 | Harmful-content benchmarks (StrongREJECT/JBB/AdvBench) | **run** (real ASR; see `FINDINGS.md §2c`) |
