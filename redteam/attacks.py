@@ -10,6 +10,10 @@ operational harmful content. They map 1:1 to the §1 verified findings:
   TAP         -> Tree of Attacks with Pruning (PAIR generalized to a pruned beam search)
   BestOfN     -> Best-of-N: sample N input augmentations, keep any that break
 GCG (white-box gradient) is a separate heavy module - see README (needs a local HF model).
+
+PAIR/TAP are single-prompt refinement families (attacker LLM in the loop); BestOfN is the
+gradient-free augmentation-sampling family. Both TAP and BestOfN are QUERY-HEAVY, so they are
+opt-in via `--attacks tap`/`--attacks bon` rather than in the default set.
 """
 from __future__ import annotations
 import base64, codecs, random, zlib
