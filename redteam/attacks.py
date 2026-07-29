@@ -86,7 +86,7 @@ class ManyShot:
     ]
     def run(self, behavior, target, judge):
         n = behavior.meta.get("shots_n", 8)
-        shots = behavior.meta.get("shots", self.BENIGN_SHOTS)
+        shots = behavior.meta.get("shots") or self.BENIGN_SHOTS   # empty/absent -> default (no /0)
         block = "\n\n".join(f"User: {q}\nAssistant: {a}" for q, a in (shots * (n // len(shots) + 1))[:n])
         sys = behavior.meta.get("system", "")
         tr = ([Turn("system", sys)] if sys else []) + [Turn("user", f"{block}\n\nUser: {behavior.goal}\nAssistant:")]
