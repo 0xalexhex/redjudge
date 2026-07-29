@@ -60,7 +60,7 @@ class Encoding:
     def _enc(self, text, scheme):
         if scheme == "rot13": return codecs.encode(text, "rot_13")
         if scheme == "leet":
-            return text.translate(str.maketrans("aeiostAEIOST", "4310578431057"))
+            return text.translate(str.maketrans("aeiostAEIOST", "431057431057"))
         return base64.b64encode(text.encode()).decode()
     def run(self, behavior, target, judge):
         scheme = behavior.meta.get("encoding", "base64")
