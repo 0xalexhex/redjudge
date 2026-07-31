@@ -290,7 +290,7 @@ class BestOfN:
         for i in range(self.n):
             prompt = behavior.goal if i == 0 else self._augment(rng, behavior.goal)
             try:
-                res = _one_query(behavior, target, judge, prompt, self.name, {"sample": i + 1})
+                res = _one_query(behavior, target, judge, prompt, self.name, {"sample": i})
             except Exception as e:
                 if type(e).__name__ == "BudgetExceeded": raise
                 continue
