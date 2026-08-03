@@ -103,8 +103,12 @@ def run_matrix(behaviors, attacks, targets, judge, out_dir: Path, verbose=True):
         t0 = time.time()
         try:
             res = atk.run(beh, tgt, judge)
-        except (KeyboardInterrupt, BudgetExceeded):
-            raise                                # abort the whole run - do NOT swallow into a per-cell error
+        except (KeyboardInterrupt, BudgetExceeded) as e:
+            # Controlled stop (budget cap / Ctrl-C): keep and score the work already collected -
+            # don't discard the transcripts the kill-switch exists to protect.
+            if verbose:
+                print(f"  [ABORT ] {type(e).__name__} - persisting {len(results)} partial result(s) and scoring")
+            break
         except Exception as e:
             res = AttackResult(beh.id, atk.name, tgt.name, [], "", False, {}, error=str(e)[:200])
         res.latency_s = round(time.time() - t0, 2)
@@ -113,7 +117,7 @@ def run_matrix(behaviors, attacks, targets, judge, out_dir: Path, verbose=True):
         if verbose:
             flag = "BROKEN" if res.broken else ("err" if res.error else "ok")
             print(f"  [{flag:6}] {tgt.name:18} {atk.name:12} {beh.id:24} {res.latency_s:>5}s")
-    # persist transcripts + a flat results table
+    # persist transcripts + a flat results table (always - even a partial/aborted run)
     (out_dir / "results.jsonl").write_text(
         "\n".join(json.dumps({**r.row(), "transcript": [asdict(t) for t in r.transcript],
                               "final": r.final_response}) for r in results))
