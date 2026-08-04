@@ -58,14 +58,24 @@ class MockEnv:
 
 
 def _extract_json(text):
-    """Grab the first balanced {...} object after 'Action Input:'. Tolerates multi-line JSON."""
+    """Grab the first balanced {...} object after 'Action Input:'. Tolerates multi-line JSON and
+    braces inside string values (e.g. {"body":"hi {x}"}) by not counting braces within strings."""
     i = text.find("{")
     if i < 0:
         return {}
-    depth = 0
+    depth = 0; in_str = False; esc = False
     for j in range(i, len(text)):
-        if text[j] == "{": depth += 1
-        elif text[j] == "}":
+        ch = text[j]
+        if in_str:                       # inside a JSON string: ignore braces, track escapes/close
+            if esc:          esc = False
+            elif ch == "\\": esc = True
+            elif ch == '"':  in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
             depth -= 1
             if depth == 0:
                 try:
