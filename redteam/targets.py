@@ -22,6 +22,11 @@ def meter_cost():
     return METER["cost"]
 def cost_by_target():
     return {k: dict(v) for k, v in COST_BY_TARGET.items()}
+def reset_meter():
+    """Reset the global cost meter + budget kill-switch (fresh run / test isolation)."""
+    METER.update(prompt=0, completion=0, calls=0, cost=0.0)
+    BUDGET["limit_usd"] = None
+    COST_BY_TARGET.clear()
 def _account(usage, price=None):
     usage = usage or {}
     p = usage.get("prompt_tokens") or usage.get("input_tokens") or 0        # openai vs anthropic field names
