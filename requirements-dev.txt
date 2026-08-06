@@ -1,0 +1,2 @@
+# Dev-only. The harness itself is stdlib (+ Pillow for the multimodal suite); tests add pytest.
+pytest>=8
