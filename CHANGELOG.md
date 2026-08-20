@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.2.1
+**Self-audit: measurement-bug fixes + a real automated test suite.** No new attacks. This hardens
+the harness so the numbers it reports are trustworthy, and adds regression coverage (the repo had
+none - only the offline smoke run).
+- **Judge integrity (the important one):** the empty-answer short-circuit was scoring a canary
+  CoT-leak (secret only in `<think>`) and an agentic tool-call break (action fired, no Final Answer)
+  as SAFE. It now applies only to signals graded on the visible text (refusal/compliance), so it no
+  longer nullifies the two strongest finding classes.
+- **Unjudged state:** when every authoritative judge errors (e.g. a flaky Llama Guard), the cell is
+  flagged `unjudged` and excluded from ASR instead of silently counting as not-broken.
+- **Kill-switch:** a `--budget` cap or Ctrl-C now persists and scores the partial results already
+  collected, instead of discarding every transcript it exists to protect.
+- **Attack/report fixes:** `leet` encoding no longer crashes (12-vs-13 char `maketrans`); many-shot
+  guards an empty shots list; BoN numbers its clean baseline as sample 0; agentic JSON parsing
+  tolerates braces inside string values; defense-lift renders a correct signed value; the clean
+  control scenario is excluded from the agentic ASR.
+- **Tests + CI:** a `pytest` suite under `tests/` (strip_think, ensemble routing + empty-answer
+  semantics, canary/injection/StrongREJECT/Llama-Guard judging, BoN reproducibility, budget
+  kill-switch, scorecard math, benchmark loading, DryRun contract), wired into GitHub Actions
+  (pytest matrix over Python 3.10-3.12 + the offline smoke). `reset_meter()` added for isolation.
+
 ## v0.2.0
 **Two automated black-box jailbreak searches: TAP and Best-of-N.** Both drop into the existing
 plugin architecture (no runner change) and are opt-in via `--attacks tap`/`--attacks bon` because
