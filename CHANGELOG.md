@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.2
+**Reproducibility fixes surfaced while benchmarking qwen3.**
+- **Deterministic ASR:** the harmful/refinement attacks (direct/encoding/manyshot/multiturn/pair) and
+  the TAP/BoN query helper now call the target at temperature 0, matching the injection/agentic paths.
+  Single-run ASR was non-reproducible before - a repeat read of `qwen3:8b` direct swung 0% vs 25%.
+- **Honest over-refusal:** the over-refusal control now counts the `direct` (plain) benign ask only.
+  Running the heavy attacks on the benign set garbled prompts into refusal-looking inputs and inflated
+  the rate (e.g. `qwen3:8b` read 60%); the reporter excludes non-direct benign cells.
+- Tests for both; suite is now 54 tests.
+
 ## v0.2.1
 **Self-audit: measurement-bug fixes + a real automated test suite.** No new attacks. This hardens
 the harness so the numbers it reports are trustworthy, and adds regression coverage (the repo had
