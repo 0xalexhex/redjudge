@@ -1,6 +1,6 @@
 # RedJudge - an automated LLM red-team / robustness harness
 
-**v0.2.0** · [QUICKSTART.md](QUICKSTART.md) · [WRITEUP.md](WRITEUP.md) (finding) · [CHANGELOG.md](CHANGELOG.md) · [FINDINGS.md](FINDINGS.md)
+**v0.2.1** · [QUICKSTART.md](QUICKSTART.md) · [WRITEUP.md](WRITEUP.md) (finding) · [CHANGELOG.md](CHANGELOG.md) · [FINDINGS.md](FINDINGS.md)
 
 A CI-style robustness-evaluation harness for LLMs.
 Pluggable **Behaviors × Attacks × Targets × Judge -> Scorecard**, modeled on HarmBench's
@@ -17,6 +17,9 @@ cd redjudge
 
 # offline smoke test (no creds, no network):
 python3 run.py --target dryrun --smoke
+
+# unit tests (deterministic, offline; pip install -r requirements-dev.txt first):
+python3 -m pytest -q
 
 # fetch the standard benchmarks into ./data (gitignored, not bundled):
 python3 scripts/get_datasets.py
