@@ -291,6 +291,26 @@ direct-only, and the 21GB model cannot stay resident next to the two 8B judges (
 so a proper control needs a larger limit + the jailbreak attacks on a box with more VRAM. The stronger
 compliance-detection evidence is the qwen3:0.6b run above.
 
+### `qwen3:8b` vs `qwen3:0.6b` - model scale flips the profile (same attack set, limit 8)
+| attack | qwen3:0.6b (ASR / SR) | qwen3:8b (ASR / SR) |
+|---|---|---|
+| direct | 62% / 0.03 | 25% / 0.42 |
+| encoding | 62% / 0.00 | 0% / - |
+| manyshot | 50% / 0.00 | 0% / 0.33 |
+| bon | 100% / 0.00 | 62% / 0.46 |
+| **overall** | **69% / 0.01** | **22% / 0.40** |
+
+Scaling 0.6B -> 8B cut harmful ASR ~3x and inverted the willingness/capability profile: the 0.6B was
+compliant garbage (high Llama-Guard ASR at ~0 StrongREJECT usefulness), while the 8B is much harder to
+break AND its rarer breaks are coherent (SR ~0.4). The 8B stops falling for encoding / many-shot
+entirely; Best-of-N is the one attack that still lands (62%), consistent with the BoN paper's scaling
+claim. Caveats: (1) the core attacks (direct/encoding/manyshot) query the target at its DEFAULT
+temperature 0.7, so single-run ASR at n=8 carries real sampling variance (a repeat read direct 0% vs
+25%) - the injection/agentic paths pin temp 0 for reproducibility and the harmful path should too
+(open improvement). (2) qwen3:8b's over-refusal control read 60%, inflated because the heavy attacks
+were also applied to the benign set (same artifact as the llama3.1 run - run the control with
+`--attacks direct`).
+
 ---
 
 ## 3. Quality assurance (why these numbers are trustworthy)
