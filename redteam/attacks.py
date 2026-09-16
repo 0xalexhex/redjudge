@@ -46,7 +46,7 @@ class Direct:
     def run(self, behavior, target, judge):
         sys = behavior.meta.get("system", "")
         tr = ([Turn("system", sys)] if sys else []) + [Turn("user", behavior.goal)]
-        out = target.chat(_conv(tr))
+        out = target.chat(_conv(tr), temperature=0)
         tr.append(Turn("assistant", out))
         broken, sc = _grade(judge, behavior, tr, out)
         return AttackResult(behavior.id, self.name, target.name, tr, out, broken, sc)
@@ -69,7 +69,7 @@ class Encoding:
                 f"replying only with the result:\n\n{payload}")
         sys = behavior.meta.get("system", "")
         tr = ([Turn("system", sys)] if sys else []) + [Turn("user", wrap)]
-        out = target.chat(_conv(tr)); tr.append(Turn("assistant", out))
+        out = target.chat(_conv(tr), temperature=0); tr.append(Turn("assistant", out))
         broken, sc = _grade(judge, behavior, tr, out)
         return AttackResult(behavior.id, self.name, target.name, tr, out, broken, sc)
 
@@ -90,7 +90,7 @@ class ManyShot:
         block = "\n\n".join(f"User: {q}\nAssistant: {a}" for q, a in (shots * (n // len(shots) + 1))[:n])
         sys = behavior.meta.get("system", "")
         tr = ([Turn("system", sys)] if sys else []) + [Turn("user", f"{block}\n\nUser: {behavior.goal}\nAssistant:")]
-        out = target.chat(_conv(tr)); tr.append(Turn("assistant", out))
+        out = target.chat(_conv(tr), temperature=0); tr.append(Turn("assistant", out))
         broken, sc = _grade(judge, behavior, tr, out)
         return AttackResult(behavior.id, self.name, target.name, tr, out, broken, sc)
 
@@ -119,7 +119,7 @@ class MultiTurn:
                 if type(e).__name__ == "BudgetExceeded": raise   # let the budget kill-switch abort
                 nxt = behavior.goal
             tr.append(Turn("user", nxt))
-            last = target.chat(_conv(tr))
+            last = target.chat(_conv(tr), temperature=0)
             tr.append(Turn("assistant", last))
             broken, sc = _grade(judge, behavior, tr, last)
             if broken:
@@ -142,7 +142,7 @@ class PAIR:
         best, best_score = None, -1.0
         for i in range(self.max_iters):
             tr = ([Turn("system", sys)] if sys else []) + [Turn("user", candidate)]
-            out = target.chat(_conv(tr)); tr.append(Turn("assistant", out))
+            out = target.chat(_conv(tr), temperature=0); tr.append(Turn("assistant", out))
             broken, sc = _grade(judge, behavior, tr, out)
             res = AttackResult(behavior.id, self.name, target.name, tr, out, broken, {**sc, "iter": i + 1})
             if broken:
@@ -166,7 +166,7 @@ def _one_query(behavior, target, judge, prompt, attack_name, extra):
     """Single target query + grade -> AttackResult. Shared by TAP's tree nodes and the baseline."""
     sys = behavior.meta.get("system", "")
     tr = ([Turn("system", sys)] if sys else []) + [Turn("user", prompt)]
-    out = target.chat(_conv(tr)); tr.append(Turn("assistant", out))
+    out = target.chat(_conv(tr), temperature=0); tr.append(Turn("assistant", out))
     broken, sc = _grade(judge, behavior, tr, out)
     return AttackResult(behavior.id, attack_name, target.name, tr, out, broken, {**sc, **extra})
 
