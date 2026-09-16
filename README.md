@@ -1,6 +1,6 @@
 # RedJudge - an automated LLM red-team / robustness harness
 
-**v0.2.1** · [QUICKSTART.md](QUICKSTART.md) · [WRITEUP.md](WRITEUP.md) (finding) · [CHANGELOG.md](CHANGELOG.md) · [FINDINGS.md](FINDINGS.md)
+**v0.2.2** · [QUICKSTART.md](QUICKSTART.md) · [WRITEUP.md](WRITEUP.md) (finding) · [CHANGELOG.md](CHANGELOG.md) · [FINDINGS.md](FINDINGS.md)
 
 A CI-style robustness-evaluation harness for LLMs.
 Pluggable **Behaviors × Attacks × Targets × Judge -> Scorecard**, modeled on HarmBench's
