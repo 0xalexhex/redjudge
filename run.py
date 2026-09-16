@@ -59,7 +59,7 @@ def build_attacks(names, attacker):
     reg = {"direct": Direct(), "encoding": Encoding(), "manyshot": ManyShot(),
            "multiturn": MultiTurn(attacker=attacker), "pair": PAIR(attacker=attacker),
            "tap": TAP(attacker=attacker), "bon": BestOfN()}
-    for atk in injection_attacks():                    # indirect-injection techniques
+    for atk in injection_attacks(attacker):            # indirect-injection (adaptive uses the attacker)
         reg[atk.name] = atk
     for atk in multimodal_attacks():                   # visual / typographic injection
         reg[atk.name] = atk
