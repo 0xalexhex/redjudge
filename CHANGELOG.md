@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.3.0
+**Adaptive and defense-aware indirect injection, novel carriers, and the first live frontier-model runs
+(Opus 5 / Sonnet 5 / Gemini 3.8 Flash).**
+- New attacks: `inj_adaptive` (attacker-in-the-loop indirect injection that refines the planted
+  instruction across rounds) and `inj_adaptive_def_aware` (a defense-aware attacker coached to escape
+  the Spotlighting delimiter framing). The reporter pairs each with its defended twin, so the static and
+  adaptive defense-lift sit side by side.
+- Four novel injection carriers the fixed benchmarks miss: MCP tool-description poisoning, CI/CD log,
+  git issue (secret exfil), and structured API / tool-result JSON.
+- Injection judge fix: `exfil` mode no longer counts a secret named WHILE refusing as a leak (a
+  quote-echo false positive, caught by transcript verification on a live Sonnet 5 run).
+- First live results, bare API, benign markers, every break transcript-verified: naive injection is
+  followed at 20-33% across the three models (Opus 5 the most robust); a defense-aware output-field
+  escape cracked the Spotlighting defense on both Sonnet 5 and Opus 5 at ~10%, single-run and not yet
+  reproduced. See FINDINGS.md sections 2f and 2g.
+- Research: `../claude5-eval-plan.md` targeting brief plus a deep-research backlog of niche 2026 attack
+  classes (MCP / schema poisoning, memory poisoning, CoT hijacking, prefill) to build next.
+- Rolls up the v0.2.1 self-audit (10 measurement-bug fixes, 64-test pytest suite, CI) and the v0.2.2
+  reproducibility fixes (temperature 0 on the harmful attacks, honest over-refusal control).
+
 ## v0.2.2
 **Reproducibility fixes surfaced while benchmarking qwen3.**
 - **Deterministic ASR:** the harmful/refinement attacks (direct/encoding/manyshot/multiturn/pair) and
