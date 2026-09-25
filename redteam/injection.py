@@ -215,6 +215,7 @@ def injection_attacks(attacker=None):
         IndirectInjection("inj_persona", "persona"),
         IndirectInjection("inj_roleplay", "roleplay"),
         IndirectInjection("inj_authority_def", "authority", defend=True),
+        IndirectInjection("inj_divider_def", "divider", defend=True),
         AdaptiveInjection("inj_adaptive", attacker=attacker),
         AdaptiveInjection("inj_adaptive_def", attacker=attacker, defend=True),
         AdaptiveInjection("inj_adaptive_def_aware", attacker=attacker, defend=True,
