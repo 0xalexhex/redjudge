@@ -202,7 +202,8 @@ class AdaptiveInjection:
 
 
 def injection_attacks(attacker=None):
-    """The technique lineup: 4 undefended static techniques, the authority technique WITH Spotlighting
+    """The technique lineup: 8 undefended static techniques (the 4 originals plus the Pliny-style
+    divider, refusal-suppression, persona and roleplay mechanics), two static techniques WITH
     (static defense-lift via `inj_authority` vs `inj_authority_def`), plus an adaptive attacker run
     undefended and defended (adaptive defense-lift via `inj_adaptive` vs `inj_adaptive_def`)."""
     return [
