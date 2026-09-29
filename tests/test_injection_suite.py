@@ -35,3 +35,10 @@ NEW_TECHNIQUES = ("divider", "refusal_suppress", "persona", "roleplay", "leet")
 def test_new_techniques_registered():
     for t in NEW_TECHNIQUES:
         assert t in TECHNIQUES
+
+
+def test_wrappers_return_nonempty_strings_and_do_not_crash():
+    # leetspeak uses an equal-length maketrans table; a mismatch would raise here
+    for t, fn in TECHNIQUES.items():
+        out = fn(GOAL)
+        assert isinstance(out, str) and out.strip()
