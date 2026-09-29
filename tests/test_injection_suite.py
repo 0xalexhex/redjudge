@@ -42,3 +42,9 @@ def test_wrappers_return_nonempty_strings_and_do_not_crash():
     for t, fn in TECHNIQUES.items():
         out = fn(GOAL)
         assert isinstance(out, str) and out.strip()
+
+
+def test_plain_text_wrappers_preserve_the_marker():
+    # every technique except the obfuscating ones must keep the literal marker token intact
+    for t in ("divider", "refusal_suppress", "persona", "roleplay"):
+        assert "PWNED-7F3A" in TECHNIQUES[t](GOAL)
