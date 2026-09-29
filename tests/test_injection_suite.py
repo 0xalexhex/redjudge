@@ -48,3 +48,8 @@ def test_plain_text_wrappers_preserve_the_marker():
     # every technique except the obfuscating ones must keep the literal marker token intact
     for t in ("divider", "refusal_suppress", "persona", "roleplay"):
         assert "PWNED-7F3A" in TECHNIQUES[t](GOAL)
+
+
+def test_divider_reads_as_a_format_boundary():
+    out = TECHNIQUES["divider"](GOAL)
+    assert "RESPONSE FORMAT" in out and out.lstrip().startswith(".-")
