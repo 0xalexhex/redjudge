@@ -53,3 +53,9 @@ def test_plain_text_wrappers_preserve_the_marker():
 def test_divider_reads_as_a_format_boundary():
     out = TECHNIQUES["divider"](GOAL)
     assert "RESPONSE FORMAT" in out and out.lstrip().startswith(".-")
+
+
+def test_lineup_includes_new_static_and_defended_divider():
+    names = {a.name for a in injection_attacks(attacker=None)}
+    for n in ("inj_divider", "inj_refusal_suppress", "inj_persona", "inj_roleplay", "inj_divider_def"):
+        assert n in names
