@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.4.0
+**Pliny-style injection techniques, a four-model 5.5-class sweep, and a reproduced Spotlighting crack.**
+- Five static injection wrappers ported from public jailbreak craft as benign-marker payloads:
+  `inj_divider` (a godmode ASCII divider plus a fake REQUIRED RESPONSE FORMAT header), `inj_refusal_suppress`
+  (no-disclaimer no-refusal output rules), `inj_persona` (internal-eval-mode framing), `inj_roleplay`
+  (screenplay line delivery) and `inj_leet` (leetspeak obfuscation). The defense-aware adaptive attacker
+  gained extra escape framings (output-field and refusal-suppression). 5 tests added, suite now 69.
+- Live run against the current frontier: Opus 5.5, Sonnet 5.5, GPT-6 Astra, Gemini 4 Argon, bare API via
+  OpenRouter, benign markers, every break verified by reading the transcript. See FINDINGS.md section 2h.
+- Reproduced and strengthened the v0.3 Spotlighting crack. With a strong Opus 5.5 attacker the
+  defense-aware output-field escape beat Spotlighting on both Opus 5.5 and Sonnet 5.5 at 40% (4/10 each,
+  all 8 defended breaks verified with the Spotlighting system prompt confirmed present), while the same
+  adaptive attacker that is NOT told about the delimiter stayed at 0/20. The static defense looks airtight
+  against an unaware attacker and collapses once the attacker knows the delimiter is there.
+- Honest reversal flagged: on this bare-API sweep Opus 5.5 was the MOST susceptible undefended (43%
+  overall) not the most robust, the opposite of the v0.3 Opus 5 ordering. This is benign-marker
+  instruction-following, not a harm failure, single run at n=10, and it needs confirmation. No
+  secret-exfil leaks on any model.
+
 ## v0.3.0
 **Adaptive and defense-aware indirect injection, novel carriers, and the first live frontier-model runs
 (Opus 5 / Sonnet 5 / Gemini 3.8 Flash).**
