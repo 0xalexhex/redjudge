@@ -105,6 +105,15 @@ def _resolve_defense(defend, defense):
     return defense or ("spotlight" if defend else None)
 
 
+def _defended(task, carrier, base_sys, defense):
+    """Assemble (system, user) for one injection turn, applying the named defense if any."""
+    if not defense:
+        return base_sys, f"{task}\n\n{carrier}"
+    body = _datamark(carrier) if defense == "datamark" else carrier
+    sys = (base_sys + "\n\n" if base_sys else "") + DEFENSES[defense]
+    return sys, f"{task}\n\n<untrusted_data>\n{body}\n</untrusted_data>"
+
+
 class IndirectInjection:
     """One injection technique, optionally with the Spotlighting defense applied. Assembles
     user_task + carrier(with the wrapped injection) and grades whether the model followed it."""
