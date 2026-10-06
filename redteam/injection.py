@@ -117,21 +117,15 @@ def _defended(task, carrier, base_sys, defense):
 class IndirectInjection:
     """One injection technique, optionally with the Spotlighting defense applied. Assembles
     user_task + carrier(with the wrapped injection) and grades whether the model followed it."""
-    def __init__(self, name, technique="naive", defend=False):
+    def __init__(self, name, technique="naive", defend=False, defense=None):
         self.name = name
         self._wrap = TECHNIQUES[technique]
-        self.defend = defend
+        self.defense = _resolve_defense(defend, defense)
     def run(self, behavior, target, judge):
         inj = self._wrap(behavior.goal)
         carrier = behavior.meta["carrier"].replace("{INJ}", inj)
-        task = behavior.meta["user_task"]
-        base_sys = behavior.meta.get("system", "")
-        if self.defend:
-            sys = (base_sys + "\n\n" if base_sys else "") + SPOTLIGHT_SYS
-            user = f"{task}\n\n<untrusted_data>\n{carrier}\n</untrusted_data>"
-        else:
-            sys = base_sys
-            user = f"{task}\n\n{carrier}"
+        sys, user = _defended(behavior.meta["user_task"], carrier,
+                              behavior.meta.get("system", ""), self.defense)
         tr = ([Turn("system", sys)] if sys else []) + [Turn("user", user)]
         out = target.chat(_conv(tr), temperature=0)        # deterministic -> reproducible ASR/defense-lift
         tr.append(Turn("assistant", out))
