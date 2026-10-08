@@ -143,23 +143,17 @@ class AdaptiveInjection:
     adaptive attacker, so the two lifts side by side are the finding. Objective and grading stay
     benign (emit the planted marker / leak the planted canary); falls back to self-attack with no
     separate attacker."""
-    def __init__(self, name, attacker=None, defend=False, defense_aware=False, max_iters=4):
+    def __init__(self, name, attacker=None, defend=False, defense_aware=False, max_iters=4, defense=None):
         self.name = name
         self.attacker = attacker
-        self.defend = defend
+        self.defense = _resolve_defense(defend, defense)
         self.defense_aware = defense_aware      # coach the attacker to break the delimiter/spotlighting framing
         self.max_iters = max_iters
 
     def _assemble(self, behavior, payload):
         carrier = behavior.meta["carrier"].replace("{INJ}", payload)
-        task = behavior.meta["user_task"]
-        base_sys = behavior.meta.get("system", "")
-        if self.defend:
-            sys = (base_sys + "\n\n" if base_sys else "") + SPOTLIGHT_SYS
-            user = f"{task}\n\n<untrusted_data>\n{carrier}\n</untrusted_data>"
-        else:
-            sys = base_sys
-            user = f"{task}\n\n{carrier}"
+        sys, user = _defended(behavior.meta["user_task"], carrier,
+                              behavior.meta.get("system", ""), self.defense)
         return ([Turn("system", sys)] if sys else []) + [Turn("user", user)]
 
     def run(self, behavior, target, judge):
