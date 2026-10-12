@@ -59,3 +59,14 @@ def test_lineup_includes_new_static_and_defended_divider():
     names = {a.name for a in injection_attacks(attacker=None)}
     for n in ("inj_divider", "inj_refusal_suppress", "inj_persona", "inj_roleplay", "inj_divider_def"):
         assert n in names
+
+
+# ---- v0.5.0: Unicode-tag smuggling, memory poisoning, and the datamarking defense ----
+def test_unicode_tags_registered_and_invisible():
+    assert "unicode_tags" in TECHNIQUES
+    out = TECHNIQUES["unicode_tags"](GOAL)
+    # every character is in the invisible Unicode TAG block, so no visible ASCII of the goal leaks
+    assert out and all(0xE0000 <= ord(c) <= 0xE007F for c in out)
+    assert "PWNED-7F3A" not in out                      # the marker is smuggled, not visible
+    decoded = "".join(chr(ord(c) - 0xE0000) for c in out)
+    assert "PWNED-7F3A" in decoded                      # but it round-trips back to the instruction
