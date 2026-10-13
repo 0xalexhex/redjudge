@@ -28,7 +28,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from redteam import behaviors as B, run_matrix
 from redteam.targets import DryRunTarget, build_target, BUDGET, meter_cost, cost_by_target
-from redteam.attacks import Direct, Encoding, ManyShot, MultiTurn, PAIR, TAP, BestOfN
+from redteam.attacks import Direct, Encoding, ManyShot, MultiTurn, PAIR, TAP, BestOfN, Prefill
 from redteam.judge import RefusalJudge, CanaryJudge, LlamaGuardJudge, StrongRejectJudge, LLMJudge, Ensemble
 from redteam.report import scorecard
 from redteam.injection import build_injection_suite, injection_attacks, InjectionJudge
@@ -58,7 +58,7 @@ def load_env():
 def build_attacks(names, attacker):
     reg = {"direct": Direct(), "encoding": Encoding(), "manyshot": ManyShot(),
            "multiturn": MultiTurn(attacker=attacker), "pair": PAIR(attacker=attacker),
-           "tap": TAP(attacker=attacker), "bon": BestOfN()}
+           "tap": TAP(attacker=attacker), "bon": BestOfN(), "prefill": Prefill()}
     for atk in injection_attacks(attacker):            # indirect-injection (adaptive uses the attacker)
         reg[atk.name] = atk
     for atk in multimodal_attacks():                   # visual / typographic injection
