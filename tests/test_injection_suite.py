@@ -70,3 +70,10 @@ def test_unicode_tags_registered_and_invisible():
     assert "PWNED-7F3A" not in out                      # the marker is smuggled, not visible
     decoded = "".join(chr(ord(c) - 0xE0000) for c in out)
     assert "PWNED-7F3A" in decoded                      # but it round-trips back to the instruction
+
+
+def test_lineup_includes_v05_attacks_and_datamark_defense():
+    names = {a.name for a in injection_attacks(attacker=None)}
+    for n in ("inj_unicode_tags", "inj_unicode_tags_def", "inj_memory", "inj_memory_def",
+              "inj_adaptive_datamark", "inj_adaptive_datamark_aware"):
+        assert n in names
