@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.5.0
+**A defense that holds, plus two 2026 attack classes.** v0.4 broke Spotlighting; v0.5 builds the fix.
+- New defense: Datamarking (Hines et al.), the stronger Spotlighting variant that replaces every
+  whitespace in the untrusted data with a sentinel so a forged "end of data" boundary is itself marked.
+  The injection defense hook is now pluggable (`defend=True` still means Spotlighting, `defense="datamark"`
+  selects the new one).
+- New attacks: memory / cross-turn persistence poisoning (`inj_memory`, a 2-turn attack where a planted
+  rule persists into an unrelated later turn), Unicode-tag ASCII smuggling (`inj_unicode_tags`, the
+  instruction hidden in invisible U+E00xx tag characters), and an assistant-prefix prefill attack
+  (`--attacks prefill`, a bare-API technique). Lineup grew from 13 to 19; suite now 77 tests.
+- Live result, both Claude 5.5 models, strong Opus attacker, every break transcript-verified: Datamarking
+  held at 0% against the same defense-aware attacker that beat Spotlighting at 20-30% in the same run.
+  Memory persistence broke Opus 5.5 at 70% and Sonnet 5.5 at 50%. Unicode-tag smuggling was mostly
+  resisted (Opus 0%, Sonnet 10%). See FINDINGS.md section 2i.
+
 ## v0.4.0
 **Pliny-style injection techniques, a four-model 5.5-class sweep, and a reproduced Spotlighting crack.**
 - Five static injection wrappers ported from public jailbreak craft as benign-marker payloads:
