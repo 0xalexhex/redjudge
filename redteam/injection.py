@@ -149,10 +149,15 @@ def _resolve_defense(defend, defense):
     return defense or ("spotlight" if defend else None)
 
 
-def _defended(task, carrier, base_sys, defense):
-    """Assemble (system, user) for one injection turn, applying the named defense if any."""
+def _defended(task, carrier, base_sys, defense, seed=""):
+    """Assemble (system, user) for one injection turn, applying the named defense if any. `seed` fixes
+    the sealed defense's random tag per scenario so a run stays reproducible."""
     if not defense:
         return base_sys, f"{task}\n\n{carrier}"
+    if defense == "sealed":
+        tag = _nonce(seed or carrier)
+        sys = (base_sys + "\n\n" if base_sys else "") + SEALED_SYS_TMPL.format(tag=tag)
+        return sys, f"{task}\n\n<{tag}>\n{carrier}\n</{tag}>"
     body = _datamark(carrier) if defense == "datamark" else carrier
     sys = (base_sys + "\n\n" if base_sys else "") + DEFENSES[defense]
     return sys, f"{task}\n\n<untrusted_data>\n{body}\n</untrusted_data>"
@@ -169,7 +174,7 @@ class IndirectInjection:
         inj = self._wrap(behavior.goal)
         carrier = behavior.meta["carrier"].replace("{INJ}", inj)
         sys, user = _defended(behavior.meta["user_task"], carrier,
-                              behavior.meta.get("system", ""), self.defense)
+                              behavior.meta.get("system", ""), self.defense, seed=behavior.id)
         tr = ([Turn("system", sys)] if sys else []) + [Turn("user", user)]
         out = target.chat(_conv(tr), temperature=0)        # deterministic -> reproducible ASR/defense-lift
         tr.append(Turn("assistant", out))
@@ -197,7 +202,7 @@ class AdaptiveInjection:
     def _assemble(self, behavior, payload):
         carrier = behavior.meta["carrier"].replace("{INJ}", payload)
         sys, user = _defended(behavior.meta["user_task"], carrier,
-                              behavior.meta.get("system", ""), self.defense)
+                              behavior.meta.get("system", ""), self.defense, seed=behavior.id)
         return ([Turn("system", sys)] if sys else []) + [Turn("user", user)]
 
     def run(self, behavior, target, judge):
@@ -274,7 +279,7 @@ class MemoryInjection:
                    f"token {marker} on its own line.")
         carrier = behavior.meta["carrier"].replace("{INJ}", persist)
         sys, user = _defended(behavior.meta["user_task"], carrier,
-                              behavior.meta.get("system", ""), self.defense)
+                              behavior.meta.get("system", ""), self.defense, seed=behavior.id)
         t1 = ([Turn("system", sys)] if sys else []) + [Turn("user", user)]
         out1 = target.chat(_conv(t1), temperature=0)
         # turn 2: a benign, unrelated question that never mentions the marker
