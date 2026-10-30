@@ -357,6 +357,9 @@ def injection_attacks(attacker=None):
         AdaptiveInjection("inj_adaptive_sealed", attacker=attacker, defense="sealed"),
         AdaptiveInjection("inj_adaptive_sealed_aware", attacker=attacker, defense="sealed",
                           defense_aware=True, max_iters=8),
+        AdaptiveInjection("inj_adaptive_sandwich", attacker=attacker, defense="sandwich"),
+        AdaptiveInjection("inj_adaptive_sandwich_aware", attacker=attacker, defense="sandwich",
+                          defense_aware=True, max_iters=8),
     ]
 
 
