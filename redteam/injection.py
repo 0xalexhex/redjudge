@@ -330,6 +330,11 @@ def injection_attacks(attacker=None):
         AdaptiveInjection("inj_adaptive_datamark", attacker=attacker, defense="datamark"),
         AdaptiveInjection("inj_adaptive_datamark_aware", attacker=attacker, defense="datamark",
                           defense_aware=True, max_iters=8),
+        # sealed (random-nonce) delimiters vs the same defense-aware attacker: can it forge a boundary it
+        # cannot see? (FINDINGS 2k open question)
+        AdaptiveInjection("inj_adaptive_sealed", attacker=attacker, defense="sealed"),
+        AdaptiveInjection("inj_adaptive_sealed_aware", attacker=attacker, defense="sealed",
+                          defense_aware=True, max_iters=8),
     ]
 
 
