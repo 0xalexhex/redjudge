@@ -59,3 +59,16 @@ def test_report_renders_adaptive_defense_comparison(tmp_path):
     md = scorecard(res, tmp_path)
     assert "Adaptive-attacker defense comparison" in md
     assert "none (undefended)" in md and "sealed (attacker aware)" in md
+
+
+# ---- sandwich (instruction-reiteration) defense ----
+def test_sandwich_restates_the_task_after_the_untrusted_data():
+    sys, user = _defended("Summarize the article.", "panda facts {INJ}", "", "sandwich")
+    assert user.index("</untrusted_data>") < user.rindex("Reminder")   # the reminder comes AFTER the data
+    assert "your only task is: Summarize the article." in user
+    assert "restated after the data" in sys.lower()
+
+
+def test_sandwich_adaptive_attacks_are_registered():
+    names = {a.name for a in injection_attacks()}
+    assert {"inj_adaptive_sandwich", "inj_adaptive_sandwich_aware"} <= names
