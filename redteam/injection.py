@@ -323,6 +323,9 @@ def injection_attacks(attacker=None):
         IndirectInjection("inj_persona", "persona"),
         IndirectInjection("inj_roleplay", "roleplay"),
         IndirectInjection("inj_unicode_tags", "unicode_tags"),
+        IndirectInjection("inj_nospace", "nospace"),
+        # the whitespace-free payload against datamarking: does an unmarked instruction slip the sentinel?
+        IndirectInjection("inj_nospace_datamark", "nospace", defense="datamark"),
         IndirectInjection("inj_authority_def", "authority", defend=True),
         IndirectInjection("inj_divider_def", "divider", defend=True),
         IndirectInjection("inj_unicode_tags_def", "unicode_tags", defend=True),
