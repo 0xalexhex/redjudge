@@ -72,3 +72,10 @@ def test_sandwich_restates_the_task_after_the_untrusted_data():
 def test_sandwich_adaptive_attacks_are_registered():
     names = {a.name for a in injection_attacks()}
     assert {"inj_adaptive_sandwich", "inj_adaptive_sandwich_aware"} <= names
+
+
+# ---- more 2026 carriers (v0.7) ----
+def test_v07_carriers_present():
+    from redteam.injection import build_injection_suite
+    types = {b.meta["carrier_type"] for b in build_injection_suite()}
+    assert {"chat_message", "pdf_meta", "email_header"} <= types
