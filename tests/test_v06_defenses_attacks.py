@@ -35,3 +35,13 @@ def test_nospace_payload_carries_no_datamarkable_whitespace():
 def test_nospace_attacks_are_registered():
     names = {a.name for a in injection_attacks()}
     assert {"inj_nospace", "inj_nospace_datamark"} <= names
+
+
+# ---- new 2026 carriers ----
+def test_v06_carriers_present_and_well_formed():
+    from redteam.injection import build_injection_suite
+    suite = build_injection_suite()
+    types = {b.meta["carrier_type"] for b in suite}
+    assert {"calendar", "jira_ticket"} <= types
+    for b in suite:                                      # every carrier keeps the {INJ} slot and a marker
+        assert "{INJ}" in b.meta["carrier"] and b.meta["secret"]
