@@ -138,6 +138,20 @@ def scorecard(results, out_dir: Path):
                 # signed change (defended - undefended): negative = defense reduced ASR (good),
                 # positive = defense made it worse. Avoids the '−-N' render on a negative lift.
                 L.append(f"| {t} | {base} | {u:.0f}% | {d:.0f}% | {d-u:+.0f} pts |")
+        # adaptive-attacker defense comparison: the SAME adaptive attacker against each defense, so the
+        # scorecard shows which defense actually holds (the comparison FINDINGS 2h-2k make by hand).
+        ADAPTIVE_DEF = {
+            "inj_adaptive": "none (undefended)",
+            "inj_adaptive_def": "spotlight", "inj_adaptive_def_aware": "spotlight (attacker aware)",
+            "inj_adaptive_datamark": "datamark", "inj_adaptive_datamark_aware": "datamark (attacker aware)",
+            "inj_adaptive_sealed": "sealed", "inj_adaptive_sealed_aware": "sealed (attacker aware)",
+        }
+        adef = [(t, ADAPTIVE_DEF[a], b, n) for (t, a), (b, n) in inj_ta.items() if a in ADAPTIVE_DEF]
+        if adef:
+            L += ["", "### Adaptive-attacker defense comparison (same attacker vs each defense)", "",
+                  "| target | defense | ASR | followed/total |", "|---|---|---|---|"]
+            for t, d, b, n in sorted(adef):
+                L.append(f"| {t} | {d} | {_pct(b,n)} | {b}/{n} |")
 
     # ---- agentic tool-abuse: did the agent perform the attacker's action? ----
     if agentic:
