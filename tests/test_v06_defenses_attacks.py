@@ -105,3 +105,9 @@ def test_insert_without_judge_model_falls_back_to_non_refusal():
     from redteam.injection import InjectionJudge
     beh = _phish_beh()
     assert InjectionJudge().grade(beh, [], "Sure, visit safe-demo.example/promo")[0] is True
+
+
+def test_phishing_insert_carrier_is_in_the_suite():
+    from redteam.injection import build_injection_suite
+    phish = [b for b in build_injection_suite() if b.id == "inj.webpage_phish"]
+    assert phish and phish[0].meta["obey"] == "insert"
