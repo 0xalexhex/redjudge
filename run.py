@@ -189,16 +189,17 @@ def main():
     attacks = build_attacks(attack_names, attacker)
 
     # ---- judges: validated ensemble (guard/judge via shortcut or full JSON) ----
-    judges = [RefusalJudge(), CanaryJudge(), AgenticJudge(), InjectionJudge()]
+    judge_spec = a.judge_model or (json.dumps(_target_spec(a.judge)) if a.judge else None)
+    judge_llm = build_target(json.loads(judge_spec)) if judge_spec else None
+    judges = [RefusalJudge(), CanaryJudge(), AgenticJudge(), InjectionJudge(llm=judge_llm)]
     if a.guard_model or a.guard:
         gs = json.loads(a.guard_model) if a.guard_model else _guard_spec(a.guard)
         judges.append(LlamaGuardJudge(gs.get("base_url", "http://localhost:11434"),
                                       gs.get("model", "llama-guard3:8b")))
-    judge_spec = a.judge_model or (json.dumps(_target_spec(a.judge)) if a.judge else None)
     if judge_spec:
-        judges.append(StrongRejectJudge(build_target(json.loads(judge_spec))))
+        judges.append(StrongRejectJudge(judge_llm))
         if a.legacy_judge:
-            judges.append(LLMJudge(build_target(json.loads(judge_spec))))
+            judges.append(LLMJudge(judge_llm))
     judge = Ensemble(judges)
 
     n_harm = sum(1 for b in behaviors if not b.benign)
