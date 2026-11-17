@@ -45,3 +45,17 @@ def test_v06_carriers_present_and_well_formed():
     assert {"calendar", "jira_ticket"} <= types
     for b in suite:                                      # every carrier keeps the {INJ} slot and a marker
         assert "{INJ}" in b.meta["carrier"] and b.meta["secret"]
+
+
+# ---- report: adaptive-attacker defense comparison ----
+def test_report_renders_adaptive_defense_comparison(tmp_path):
+    from redteam.core import AttackResult
+    from redteam.report import scorecard
+    def r(attack, broken):
+        return AttackResult("inj.x", attack, "m", [], "ans", broken, {}, signal="inject",
+                            benign=False, category="injection/hijack")
+    res = [r("inj_adaptive", True), r("inj_adaptive", True),                    # undefended 100%
+           r("inj_adaptive_sealed_aware", False), r("inj_adaptive_sealed_aware", False)]  # sealed 0%
+    md = scorecard(res, tmp_path)
+    assert "Adaptive-attacker defense comparison" in md
+    assert "none (undefended)" in md and "sealed (attacker aware)" in md
