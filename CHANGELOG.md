@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.6.0
+**Harden the defense and probe its assumptions.** Answers the two open questions FINDINGS 2k flagged,
+plus two new carriers and a defense-comparison report.
+- New defense: sealed delimiters (random-sequence enclosure). The untrusted data is wrapped in a
+  per-scenario RANDOM tag the attacker never sees, so the forged-close escape that beats Spotlighting
+  cannot match the boundary (`defense="sealed"`, `inj_adaptive_sealed` / `inj_adaptive_sealed_aware`).
+- New attack: the whitespace-free (`nospace`) technique, which writes the payload with no whitespace so
+  Datamarking's sentinel has nothing to mark (`inj_nospace`, `inj_nospace_datamark`). Directly probes the
+  Datamarking assumption.
+- New carriers: calendar invite (ICS DESCRIPTION) and issue-tracker (Jira) comment. Suite now 12 carriers.
+- Report: an adaptive-attacker defense comparison table (undefended vs spotlight / datamark / sealed,
+  aware and unaware) so the scorecard shows which defense holds against the same attacker.
+- Tests added for all of the above; suite now 84.
+
 ## v0.5.1
 **Newest Nov-2026 flagships, and the Spotlighting crack reproduced on GPT.** No new code, two live test
 runs against the frontier models released this month.
