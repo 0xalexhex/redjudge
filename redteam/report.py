@@ -145,6 +145,7 @@ def scorecard(results, out_dir: Path):
             "inj_adaptive_def": "spotlight", "inj_adaptive_def_aware": "spotlight (attacker aware)",
             "inj_adaptive_datamark": "datamark", "inj_adaptive_datamark_aware": "datamark (attacker aware)",
             "inj_adaptive_sealed": "sealed", "inj_adaptive_sealed_aware": "sealed (attacker aware)",
+            "inj_adaptive_sandwich": "sandwich", "inj_adaptive_sandwich_aware": "sandwich (attacker aware)",
         }
         adef = [(t, ADAPTIVE_DEF[a], b, n) for (t, a), (b, n) in inj_ta.items() if a in ADAPTIVE_DEF]
         if adef:
