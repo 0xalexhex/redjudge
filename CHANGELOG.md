@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.1
+**Newest Nov-2026 flagships, and the Spotlighting crack reproduced on GPT.** No new code, two live test
+runs against the frontier models released this month.
+- Sweep of claude-fable-5.2, gpt-6.2-astra and gemini-4-neon (naive, the defense-aware Spotlighting
+  escape, and memory). The output-field escape that beat the Claude 5.5 models in v0.4 now lands on
+  gpt-6.2-astra at 20%, while the newest Claude and Gemini hold it at 0%. See FINDINGS.md section 2j.
+- Harden check: the Datamarking defense from v0.5 holds the same escape on gpt-6.2-astra at 0/10 (strong
+  Opus 5.5 attacker, sentinel verified present, full refinement budget spent). The break-and-fix pair
+  transfers to a non-Claude flagship. See FINDINGS.md section 2k.
+
 ## v0.5.0
 **A defense that holds, plus two 2026 attack classes.** v0.4 broke Spotlighting; v0.5 builds the fix.
 - New defense: Datamarking (Hines et al.), the stronger Spotlighting variant that replaces every
