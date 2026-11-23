@@ -57,7 +57,7 @@ Beyond single-turn jailbreaks, three built-in suites cover the modern high-impac
 with benign markers (no harmful content) via the **obedience-aware** judge, so a model that merely
 quotes an injected instruction is not miscounted as broken.
 ```bash
-# Indirect prompt injection (6 carriers x 4 techniques) + a Spotlighting DEFENSE-LIFT number:
+# Indirect prompt injection (16 carriers, 11 techniques) + spotlight/datamark/sealed/sandwich defenses:
 python3 run.py --suite injection --target ollama:llama3.1:8b
 
 # Agentic tool-abuse: a ReAct agent over MOCK sandboxed tools; injection planted in tool output.
