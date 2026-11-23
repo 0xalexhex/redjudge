@@ -3,16 +3,21 @@
 ## v0.6.0
 **Harden the defense and probe its assumptions.** Answers the two open questions FINDINGS 2k flagged,
 plus two new carriers and a defense-comparison report.
-- New defense: sealed delimiters (random-sequence enclosure). The untrusted data is wrapped in a
-  per-scenario RANDOM tag the attacker never sees, so the forged-close escape that beats Spotlighting
-  cannot match the boundary (`defense="sealed"`, `inj_adaptive_sealed` / `inj_adaptive_sealed_aware`).
-- New attack: the whitespace-free (`nospace`) technique, which writes the payload with no whitespace so
+- New defenses: sealed delimiters (random-sequence enclosure) wrap the untrusted data in a per-scenario
+  RANDOM tag the attacker never sees, so the forged-close escape that beats Spotlighting cannot match the
+  boundary; and the sandwich defense (instruction reiteration) restates the task after the data
+  (`defense="sealed"` / `"sandwich"`, with `inj_adaptive_sealed` / `inj_adaptive_sandwich` and `_aware`).
+- New attack: the whitespace-free (`nospace`) technique writes the payload with no whitespace so
   Datamarking's sentinel has nothing to mark (`inj_nospace`, `inj_nospace_datamark`). Directly probes the
   Datamarking assumption.
-- New carriers: calendar invite (ICS DESCRIPTION) and issue-tracker (Jira) comment. Suite now 12 carriers.
-- Report: an adaptive-attacker defense comparison table (undefended vs spotlight / datamark / sealed,
-  aware and unaware) so the scorecard shows which defense holds against the same attacker.
-- Tests added for all of the above; suite now 84.
+- LLM obedience judge for the content-insertion (phishing) objective that was parked in v0.2 because
+  obey-vs-quote cannot be told apart deterministically. `InjectionJudge` now takes an optional judge model
+  (wired from `--judge`) and the `webpage_phish` carrier is re-enabled.
+- New carriers: calendar invite (ICS), Jira comment, Slack message, PDF metadata and email header. The
+  injection suite now has 16 carriers.
+- Report: an adaptive-attacker defense comparison table (undefended vs spotlight / datamark / sealed /
+  sandwich, aware and unaware) so the scorecard shows which defense holds against the same attacker.
+- Tests added for all of the above; suite now 90.
 
 ## v0.5.1
 **Newest Nov-2026 flagships, and the Spotlighting crack reproduced on GPT.** No new code, two live test
